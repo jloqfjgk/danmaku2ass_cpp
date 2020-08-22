@@ -59,11 +59,11 @@ bool CommentParser::Convert(int type){
 }
 
 bool CommentParser::_convertBilibili(){
-    Ass *ass = new Ass;
+    Ass ass;
     
-    ass->init(out);
-    ass->SetDuration(duration_marquee,duration_still);
-    ass->WriteHead(width, height, font, fontsize,alpha);
+    ass.init(out);
+    ass.SetDuration(duration_marquee,duration_still);
+    ass.WriteHead(width, height, font, fontsize,alpha);
 
     rapidxml::file<> xmlFile(in);
     if(xmlFile.size() < 1){
@@ -137,11 +137,11 @@ bool CommentParser::_convertBilibili(){
         /* Arg7 : sender uid ( not needed ) */
         /* Arg8 : database rowID ( not needed ) */
         
-        ass->AppendComment(appear_time, comment_mode, font_color, child->value());
+        ass.AppendComment(appear_time, comment_mode, font_color, child->value());
     }
     
     
-    ass->WriteToDisk(disallowModes);
+    ass.WriteToDisk(disallowModes);
     
     return true;
 }
@@ -164,18 +164,18 @@ void danmaku2ass(const char *infile,const char *outfile,int width,int height,con
     string headline;
     getline(input,headline);
     int type = GetCommentType(headline);
-    CommentParser *p = new CommentParser;
-    p->SetFile(infile, outfile);
-    p->SetRes(width, height);
-    p->SetFont(font, fontsize);
-    p->SetDuration(duration_marquee, duration_still);
-    p->SetAlpha(alpha);
+    CommentParser p;
+    p.SetFile(infile, outfile);
+    p.SetRes(width, height);
+    p.SetFont(font, fontsize);
+    p.SetDuration(duration_marquee, duration_still);
+    p.SetAlpha(alpha);
     if(type == 1){
         //cout << "Avfun format detected ! Converting..." << endl;
         cout << "Sorry , The format is not supported" << endl;
     }else if(type == 2){
         cout << "Bilibili format detected ! Converting..." << endl;
-        bool result = p->Convert(type);
+        bool result = p.Convert(type);
         if(result){
             cout << "Convert succeed" << endl;
         }else{
@@ -188,6 +188,5 @@ void danmaku2ass(const char *infile,const char *outfile,int width,int height,con
         cout << "ERROR: Unable to get comment type" << endl;
     }
     input.close();
-    delete p;
 }
 
