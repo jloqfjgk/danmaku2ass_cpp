@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <time.h>
 
@@ -27,7 +28,7 @@ void Ass::SetDuration(int dm,int ds){
     duration_still = ds;
 }
 
-void Ass::WriteHead(int width,int height,const char *font,float fontsize,float alpha){
+void Ass::WriteHead(int width,int height,const char *font,int fontsize,double alpha){
     
     srand((int)time(0));
     
@@ -44,9 +45,10 @@ void Ass::WriteHead(int width,int height,const char *font,float fontsize,float a
     out << "WrapStyle: 2" << endl;
     out << "ScaledBorderAndShadow: yes" << endl;
     out << "YCbCr Matrix: TV.601" << endl << endl;
-    
-    char alpha_hex[3];
-    sprintf(alpha_hex, "%02X", 255-round_int(alpha*255));
+
+    stringstream hex_builder;
+    hex_builder << std::hex << std::setfill('0') << std::setw(2) << (255 - round_int(alpha * 255));
+    string alpha_hex = hex_builder.str();
     
     // Write ass styles , maybe disorder , See https://en.wikipedia.org/wiki/SubStation_Alpha
     out << "[V4+ Styles]"<< endl;
@@ -71,7 +73,7 @@ void Ass::WriteHead(int width,int height,const char *font,float fontsize,float a
     out << "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text" << endl;
 }
 
-void Ass::AppendComment(float appear_time,int comment_mode,int font_color,const char *content){
+void Ass::AppendComment(double appear_time,int comment_mode,int font_color,const char *content){
     int duration;
 
     string str = content;
@@ -84,22 +86,21 @@ void Ass::AppendComment(float appear_time,int comment_mode,int font_color,const 
         return;
     }
     
-    int ContentFontLen = (int)strLength*FontSize;
+    int ContentFontLen = strLength * FontSize;
     
-    char effect[30];
+    stringstream effect;
     if(comment_mode < 4){
-        sprintf(effect,"\\move(%d, [MROW], %d, [MROW])",VideoWidth,-ContentFontLen);
+        effect << "\\move(" << VideoWidth << ", [MROW], " << -ContentFontLen << ", [MROW])";
         duration = duration_marquee;
     }else if(comment_mode == 4){
-        sprintf(effect,"\\an2\\pos(%d,[BottomROW])",VideoWidth/2);
+        effect << "\\an2\\pos(" << (VideoWidth / 2) << ",[BottomROW])";
         duration = duration_still;
     }else if(comment_mode == 5){
-        sprintf(effect,"\\an8\\pos(%d,[TopROW])",VideoWidth/2);
+        effect << "\\an8\\pos(" << (VideoWidth / 2) << ",[TopROW])";
         duration = duration_still;
     }else{
         return;
     }
-    string effectStr(effect);
     string color = "";
     if(font_color != 16777215){
         if(font_color == 0x000000){
@@ -110,20 +111,18 @@ void Ass::AppendComment(float appear_time,int comment_mode,int font_color,const 
             int R = (font_color >> 16) & 0xff;
             int G = (font_color >> 8) & 0xff;
             int B = font_color & 0xff;
-            char hexcolor[7];
-            sprintf(hexcolor, "%02X%02X%02X",B,G,R);
-            hexcolor[6] = '\0';
-            string strcolor(hexcolor);
-            color = "\\c&H" + strcolor + "&";
+            stringstream hex_builder;
+            hex_builder << std::hex << std::setfill('0') << std::setw(2) << B << G << R;
+            color = "\\c&H" + hex_builder.str() + "&";
         }
     }
 
     stringstream ss;
-    ss << "Dialogue: 2," << TS2t(appear_time) << "," << TS2t(appear_time + duration) << "," << style_name << ",,0000,0000,0000,,{" << effectStr << color << "}" << str;
+    ss << "Dialogue: 2," << TS2t(appear_time) << "," << TS2t(appear_time + duration) << "," << style_name << ",,0000,0000,0000,,{" << effect.str() << color << "}" << str;
     
     pair<int,std::string> contentPair = make_pair(ContentFontLen,ss.str());
 
-    comment_map.insert( std::pair<float, std::pair<int,std::string>>(appear_time,contentPair) );
+    comment_map.insert( std::pair<double, std::pair<int,std::string>>(appear_time,contentPair) );
     
 }
 
@@ -132,13 +131,13 @@ inline void Ass::stripStr(string in){
     std::replace(in.begin(), in.end(), '\n', ' ');
 }
 
-int Ass::round_int( double r ) {
-    return (r > 0.0) ? (r + 0.5) : (r - 0.5);
+int Ass::round_int(double r) {
+    return static_cast<int>((r > 0.0) ? (r + 0.5) : (r - 0.5));
 }
 
 inline string Ass::TS2t(double timestamp){
     
-    int ts= (int)timestamp*100.0;
+    int ts= (int) timestamp * 100;
     int hour,minute,second,centsecond;
     hour = ts/360000;
     minute = ts%360000;
@@ -146,9 +145,12 @@ inline string Ass::TS2t(double timestamp){
     minute = minute/6000;
     centsecond = second%100;
     second = second/100;
-    char buff[20];
-    sprintf(buff,"%d:%02d:%02d.%02d", hour,minute,second,centsecond);
-    return string(buff);
+    stringstream ss;
+    ss << hour;
+    ss << ':' << std::setfill('0') << std::setw(2) << minute;
+    ss << ':' << std::setfill('0') << std::setw(2) << second;
+    ss << '.' << std::setfill('0') << std::setw(2) << centsecond;
+    return ss.str();
 }
 
 template<typename _Iterator1, typename _Iterator2>
@@ -187,15 +189,15 @@ void Ass::WriteToDisk(std::vector<int> disallowModes){
     int All_Rows = 0;
     int Dropped_Rows = 0;
     
-    typedef std::map<float, pair<int,std::string>>::iterator it_type;
+    typedef std::map<double, pair<int,std::string>>::iterator it_type;
     
-    float TopTime = 0;
-    float BottomTime = 0;
+    double TopTime = 0;
+    double BottomTime = 0;
     
     int TopROW = -1;
     int BottomROW = -1;
     
-    int line = ceil(VideoHeight/FontSize);
+    int line = VideoHeight / FontSize;
     
     double *rows_dismiss_time = new double[line]; // The time of scroll comment dismiss
     double *rows_visible_time = new double[line]; // The time of last char visible on screen
@@ -225,7 +227,7 @@ void Ass::WriteToDisk(std::vector<int> disallowModes){
         
         string r = iterator->second.second;
         
-        int playbackTime = iterator->first;
+        double playbackTime = iterator->first;
         double TextWidth = iterator->second.first + 2.0; // Add some space between texts
         double act_time = TextWidth / (((double)VideoWidth + TextWidth)/ (double)duration_marquee); // duration of last char visible on screen
         
@@ -252,7 +254,7 @@ void Ass::WriteToDisk(std::vector<int> disallowModes){
             if(removeTRow){
                 continue;
             }
-            float timeago =  iterator->first - TopTime;
+            double timeago =  iterator->first - TopTime;
             if(timeago > duration_still){
                 TopROW = 0;
                 TopTime = iterator->first;
@@ -264,7 +266,7 @@ void Ass::WriteToDisk(std::vector<int> disallowModes){
             if(removeBRow){
                 continue;
             }else{
-                float timeago =  iterator->first - BottomTime;
+                double timeago =  iterator->first - BottomTime;
                 if(timeago > duration_still){
                     BottomROW = 0;
                     BottomTime = iterator->first;

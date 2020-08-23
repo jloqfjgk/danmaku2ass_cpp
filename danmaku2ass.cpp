@@ -99,16 +99,18 @@ bool CommentParser::_convertBilibili(){
         if(isBlocked){
             continue;
         }
-
-        const char *separator = ","; // Separator of comment properties
-        char *p;
         
         /* Arg1 : Appear time
          The time of comment appear.
          */
-        p = strtok(child->first_attribute("p")->value(), separator);
-        if(!p){ continue; }
-        float appear_time = atof(p);
+        string p = child->first_attribute("p")->value();
+        size_t p_start = 0;
+        size_t p_end = p.find(',');
+        if (p_end == string::npos)
+        {
+            continue;
+        }
+        double appear_time = stof(p.substr(p_start, p_end - p_start));
         
         /* Arg2 : Comment mode
          123 - Scroll comment
@@ -118,19 +120,30 @@ bool CommentParser::_convertBilibili(){
          7 - Positioned comment
          8 - Javascript comment ( not convert )
          */
-        p = strtok(NULL, separator);
-        if(!p){ continue; }
-        int comment_mode = atoi(p);
-        
+        p_start = p_end + 1;
+        p_end = p.find(',', p_start);
+        if (p_end == string::npos)
+        {
+            continue;
+        }
+        int comment_mode = stoi(p.substr(p_start, p_end));
+
         /* Arg3 : Font size ( not needed )*/
-        p = strtok(NULL, separator);
-        if(!p){ continue; }
-        //int font_size = atoi(p);
-        
+        p_start = p_end + 1;
+        p_end = p.find(',', p_start);
+        if (p_end == string::npos)
+        {
+            continue;
+        }
+
         /* Arg4 : Font color */
-        p = strtok(NULL, separator);
-        if(!p){ continue; }
-        int font_color = atoi(p);
+        p_start = p_end + 1;
+        p_end = p.find(',', p_start);
+        if (p_end == string::npos)
+        {
+            continue;
+        }
+        int font_color = stoi(p.substr(p_start, p_end));
         
         /* Arg5 : Unix timestamp ( not needed ) */
         /* Arg6 : comment pool ( not needed ) */
@@ -159,7 +172,7 @@ bool CommentParser::_convertBilibili(){
  duration_still:Duration of still comment
  */
 
-void danmaku2ass(const char *infile,const char *outfile,int width,int height,const char *font,float fontsize,float alpha,float duration_marquee,float duration_still){
+void danmaku2ass(const char *infile,const char *outfile,int width,int height,const char *font,int fontsize,double alpha,int duration_marquee,int duration_still){
     std::ifstream input(infile);
     string headline;
     getline(input,headline);

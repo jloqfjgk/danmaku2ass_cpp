@@ -17,8 +17,8 @@
 class Ass{
 private:
     std::ofstream out;
-    std::map <float, std::pair<int, std::string>> comment_map;
-    int round_int( double r );
+    std::map <double, std::pair<int, std::string>> comment_map;
+    int round_int(double r);
     char style_name[10];
     
     inline std::string TS2t(double timestamp);
@@ -36,8 +36,8 @@ private:
 public:
     void init(const char *filename);
     void SetDuration(int dm,int ds);
-    void WriteHead(int width,int height,const char *font,float fontsize,float alpha);
-    void AppendComment(float appear_time,int comment_mode,int font_color,const char *content);
+    void WriteHead(int width,int height,const char *font,int fontsize,double alpha);
+    void AppendComment(double appear_time,int comment_mode,int font_color,const char *content);
     void WriteToDisk(std::vector<int> disallowModes);
 };
 
