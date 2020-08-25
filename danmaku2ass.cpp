@@ -10,8 +10,6 @@
 #include "rapidxml/rapidxml_utils.hpp"
 #include "danmaku2ass.h"
 
-using namespace std;
-using namespace rapidxml;
 using namespace Danmaku2ASS;
 
 /*
@@ -25,7 +23,7 @@ using namespace Danmaku2ASS;
  3 - Niconico
  */
 
-static int GetCommentType(string headline){
+static int GetCommentType(std::string headline){
     if(headline.find("\"commentList\":[") != std::string::npos){
         return 1;
     }else if(headline.find("xml version=\"1.0\" encoding=\"UTF-8\"?><i") != std::string::npos or
@@ -45,8 +43,8 @@ static int GetCommentType(string headline){
 bool CommentParser::convert(int type) {
     if(!type){
         std::ifstream input(m_inFile);
-        string headline;
-        getline(input,headline);
+        std::string headline;
+        getline(input, headline);
         type = GetCommentType(headline);
         input.close();
     }
@@ -70,7 +68,7 @@ bool CommentParser::_convertBilibili(){
     }
     
     rapidxml::xml_document<> doc;
-    xml_node<> *node;
+    rapidxml::xml_node<> *node;
     try {
         doc.parse<0>(xmlFile.data());
         node = doc.first_node("i"); // Get comment main node
@@ -84,7 +82,7 @@ bool CommentParser::_convertBilibili(){
     if(!node->first_node("d")){
         return false;
     }
-    for (xml_node<> *child = node->first_node("d"); child; child = child->next_sibling()) // Each comment
+    for (auto child = node->first_node("d"); child; child = child->next_sibling()) // Each comment
     {
         if(!child){
             continue;
@@ -103,10 +101,10 @@ bool CommentParser::_convertBilibili(){
         /* Arg1 : Appear time
          The time of comment appear.
          */
-        string p = child->first_attribute("p")->value();
+        std::string p = child->first_attribute("p")->value();
         size_t p_start = 0;
         size_t p_end = p.find(',');
-        if (p_end == string::npos)
+        if (p_end == std::string::npos)
         {
             continue;
         }
@@ -122,7 +120,7 @@ bool CommentParser::_convertBilibili(){
          */
         p_start = p_end + 1;
         p_end = p.find(',', p_start);
-        if (p_end == string::npos)
+        if (p_end == std::string::npos)
         {
             continue;
         }
@@ -131,7 +129,7 @@ bool CommentParser::_convertBilibili(){
         /* Arg3 : Font size ( not needed )*/
         p_start = p_end + 1;
         p_end = p.find(',', p_start);
-        if (p_end == string::npos)
+        if (p_end == std::string::npos)
         {
             continue;
         }
@@ -139,7 +137,7 @@ bool CommentParser::_convertBilibili(){
         /* Arg4 : Font color */
         p_start = p_end + 1;
         p_end = p.find(',', p_start);
-        if (p_end == string::npos)
+        if (p_end == std::string::npos)
         {
             continue;
         }
@@ -173,8 +171,8 @@ bool CommentParser::_convertBilibili(){
  */
 void Danmaku2ASS::run(const char *infile,const char *outfile,int width,int height,const char *font,int fontsize,double alpha,int duration_marquee,int duration_still){
     std::ifstream input(infile);
-    string headline;
-    getline(input,headline);
+    std::string headline;
+    getline(input, headline);
     int type = GetCommentType(headline);
     CommentParser p;
     p.setFile(infile, outfile);
@@ -184,20 +182,20 @@ void Danmaku2ASS::run(const char *infile,const char *outfile,int width,int heigh
     p.setAlpha(alpha);
     if(type == 1){
         //cout << "Avfun format detected ! Converting..." << endl;
-        cout << "Sorry , The format is not supported" << endl;
+        std::cerr << "Sorry , The format is not supported" << std::endl;
     }else if(type == 2){
-        cout << "Bilibili format detected ! Converting..." << endl;
+        std::cout << "Bilibili format detected ! Converting..." << std::endl;
         bool result = p.convert(type);
         if(result){
-            cout << "Convert succeed" << endl;
+            std::cout << "Convert succeed" << std::endl;
         }else{
-            cout << "Convert failed" << endl;
+            std::cerr << "Convert failed" << std::endl;
         }
     }else if(type == 3){
         //cout << "Niconico format detected ! Converting..." << endl;
-        cout << "Sorry , The format is not supported" << endl;
+        std::cerr << "Sorry , The format is not supported" << std::endl;
     }else{
-        cout << "ERROR: Unable to get comment type" << endl;
+        std::cerr << "ERROR: Unable to get comment type" << std::endl;
     }
     input.close();
 }

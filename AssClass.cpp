@@ -16,11 +16,10 @@
 #include <sstream>
 #include <time.h>
 
-using namespace std;
 using namespace Danmaku2ASS;
 
 // Useful functions
-static void stripStr(string& in)
+static void stripStr(std::string& in)
 {
     std::replace(in.begin(), in.end(), '\r', '\n');
     std::replace(in.begin(), in.end(), '\n', ' ');
@@ -68,7 +67,7 @@ static inline int utf8StringSize(const std::string &str)
     return res;
 }
 
-static inline string ts2t(double timestamp)
+static inline std::string ts2t(double timestamp)
 {
 
     int ts = (int)timestamp * 100;
@@ -79,7 +78,7 @@ static inline string ts2t(double timestamp)
     minute = minute / 6000;
     centsecond = second % 100;
     second = second / 100;
-    stringstream ss;
+    std::stringstream ss;
     ss << hour;
     ss << ':' << std::setfill('0') << std::setw(2) << minute;
     ss << ':' << std::setfill('0') << std::setw(2) << second;
@@ -109,25 +108,25 @@ void Ass::writeHead(int width, int height, const char *font, int fontsize, doubl
     m_width = width;
     
     // Write a♂ss head info
-    m_outStream << "[Script Info]\nScript Updated By: Danmaku2ASS_native (https://github.com/typcn/danmaku2ass_native)\nScriptType: v4.00+" << endl;
-    m_outStream << "PlayResX: " << width << endl;
-    m_outStream << "PlayResY: " << height << endl;
-    m_outStream << "Aspect Ratio: " << width << ":" << height << endl;
-    m_outStream << "Collisions: Normal" << endl;
-    m_outStream << "WrapStyle: 2" << endl;
-    m_outStream << "ScaledBorderAndShadow: yes" << endl;
-    m_outStream << "YCbCr Matrix: TV.601" << endl << endl;
+    m_outStream << "[Script Info]\nScript Updated By: Danmaku2ASS_native (https://github.com/typcn/danmaku2ass_native)\nScriptType: v4.00+" << std::endl;
+    m_outStream << "PlayResX: " << width << std::endl;
+    m_outStream << "PlayResY: " << height << std::endl;
+    m_outStream << "Aspect Ratio: " << width << ":" << height << std::endl;
+    m_outStream << "Collisions: Normal" << std::endl;
+    m_outStream << "WrapStyle: 2" << std::endl;
+    m_outStream << "ScaledBorderAndShadow: yes" << std::endl;
+    m_outStream << "YCbCr Matrix: TV.601" << std::endl << std::endl;
 
-    stringstream hex_builder;
+    std::stringstream hex_builder;
     hex_builder << std::hex << std::setfill('0') << std::setw(2) << (255 - roundInt(alpha * 255));
-    string alpha_hex = hex_builder.str();
+    std::string alpha_hex = hex_builder.str();
     
     // Write ass styles , maybe disorder , See https://en.wikipedia.org/wiki/SubStation_Alpha
-    m_outStream << "[V4+ Styles]"<< endl;
-    m_outStream << "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding"<< endl;
-    
+    m_outStream << "[V4+ Styles]" << std::endl;
+    m_outStream << "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding" << std::endl;
+
     // Get Style name
-    stringstream ss;
+    std::stringstream ss;
     ss << "TYCM_" << rand() % (int)(9999 + 1);
     m_styleName = ss.str();
     
@@ -139,15 +138,15 @@ void Ass::writeHead(int width, int height, const char *font, int fontsize, doubl
         "&H"<< alpha_hex <<"FFFFFF, " << // Secondary Color
         "&H"<< alpha_hex <<"000000, " << // Outline Color
         "&H"<< alpha_hex <<"000000, " << // Back Color
-        "0, 0, 0, 0, 100, 100, 0.00, 0.00, 1, 1, 0, 7, 0, 0, 0, 0" << endl << endl;
-    
-    m_outStream << "[Events]" << endl;
-    m_outStream << "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text" << endl;
+        "0, 0, 0, 0, 100, 100, 0.00, 0.00, 1, 1, 0, 7, 0, 0, 0, 0" << std::endl << std::endl;
+
+    m_outStream << "[Events]" << std::endl;
+    m_outStream << "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text" << std::endl;
 }
 
 void Ass::appendComment(double appear_time,int comment_mode,int font_color,const char *content){
-    
-    string str = content;
+
+    std::string str = content;
     stripStr(str);
     
     int strLength = utf8StringSize(str);
@@ -156,8 +155,8 @@ void Ass::appendComment(double appear_time,int comment_mode,int font_color,const
     }
     
     int contentFontLen = strLength * m_fontSize;
-    
-    stringstream effect;
+
+    std::stringstream effect;
     int duration;
     if(comment_mode < 4){
         effect << "\\move(" << m_width << ", [MROW], " << -contentFontLen << ", [MROW])";
@@ -172,7 +171,7 @@ void Ass::appendComment(double appear_time,int comment_mode,int font_color,const
         return;
     }
 
-    string color = "";
+    std::string color = "";
     if(font_color != 16777215){
         if(font_color == 0x000000){
             color = "\\c&H000000&";
@@ -182,16 +181,16 @@ void Ass::appendComment(double appear_time,int comment_mode,int font_color,const
             int R = (font_color >> 16) & 0xff;
             int G = (font_color >> 8) & 0xff;
             int B = font_color & 0xff;
-            stringstream hex_builder;
+            std::stringstream hex_builder;
             hex_builder << std::hex << std::setfill('0') << std::setw(2) << B << G << R;
             color = "\\c&H" + hex_builder.str() + "&";
         }
     }
 
-    stringstream ss;
+    std::stringstream ss;
     ss << "Dialogue: 2," << ts2t(appear_time) << "," << ts2t(appear_time + duration) << "," << m_styleName << ",,0000,0000,0000,,{" << effect.str() << color << "}" << str;
-    
-    pair<int,std::string> contentPair = make_pair(contentFontLen, ss.str());
+
+    std::pair<int, std::string> contentPair = make_pair(contentFontLen, ss.str());
     m_commentMap.insert(std::pair<double, std::pair<int,std::string>>(appear_time, contentPair));
     
 }
@@ -215,9 +214,9 @@ void Ass::writeToDisk(int disallowMode){
     for(auto iterator = m_commentMap.cbegin(); iterator != m_commentMap.cend(); iterator++) {
         
         All_Rows++;
-        
-        string r = iterator->second.second;
-        
+
+        std::string r = iterator->second.second;
+
         double playbackTime = iterator->first;
         double TextWidth = iterator->second.first + 2.0; // Add some space between texts
         double act_time = TextWidth / (((double) m_width + TextWidth)/ (double) m_durationMarquee); // duration of last char visible on screen
@@ -264,7 +263,7 @@ void Ass::writeToDisk(int disallowMode){
                 }else{
                     BottomROW++;
                 }
-                r = replaceAll(r,"[BottomROW]",to_string(m_height - BottomROW * m_fontSize));
+                r = replaceAll(r, "[BottomROW]", std::to_string(m_height - BottomROW * m_fontSize));
             }
         } else {
             continue;
@@ -274,9 +273,9 @@ void Ass::writeToDisk(int disallowMode){
             Dropped_Rows++;
             continue;
         }
-        
-        m_outStream << r << endl;
+
+        m_outStream << r << std::endl;
     }
-    
-    std::cout << "Comments:" << All_Rows << " Dropped:" << Dropped_Rows << endl;
+
+    std::cout << "Comments:" << All_Rows << " Dropped:" << Dropped_Rows << std::endl;
 }
