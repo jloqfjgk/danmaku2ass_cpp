@@ -8,12 +8,11 @@
 
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_utils.hpp"
-#include "AssClass.hpp"
 #include "danmaku2ass.h"
-#include "danmaku2ass.hpp"
 
 using namespace std;
 using namespace rapidxml;
+using namespace Danmaku2ASS;
 
 /*
  Get comment type
@@ -26,7 +25,7 @@ using namespace rapidxml;
  3 - Niconico
  */
 
-int GetCommentType(string headline){
+static int GetCommentType(string headline){
     if(headline.find("\"commentList\":[") != std::string::npos){
         return 1;
     }else if(headline.find("xml version=\"1.0\" encoding=\"UTF-8\"?><i") != std::string::npos or
@@ -43,9 +42,9 @@ int GetCommentType(string headline){
 }
 
 
-bool CommentParser::Convert(int type){
+bool CommentParser::convert(int type) {
     if(!type){
-        std::ifstream input(in);
+        std::ifstream input(m_inFile);
         string headline;
         getline(input,headline);
         type = GetCommentType(headline);
@@ -61,14 +60,15 @@ bool CommentParser::Convert(int type){
 bool CommentParser::_convertBilibili(){
     Ass ass;
     
-    ass.init(out);
-    ass.SetDuration(duration_marquee,duration_still);
-    ass.WriteHead(width, height, font, fontsize,alpha);
+    ass.init(m_outFile);
+    ass.setDuration(m_durationMarquee, m_durationStill);
+    ass.writeHead(m_width, m_height, m_font, m_fontSize, m_alpha);
 
-    rapidxml::file<> xmlFile(in);
+    rapidxml::file<> xmlFile(m_inFile);
     if(xmlFile.size() < 1){
         return false;
     }
+    
     rapidxml::xml_document<> doc;
     xml_node<> *node;
     try {
@@ -91,7 +91,7 @@ bool CommentParser::_convertBilibili(){
         }
         std::string v = child->value();
         bool isBlocked = false;
-        for (auto i = blockWords.begin();i != blockWords.end(); i++ ){
+        for (auto i = m_blockWords.begin();i != m_blockWords.end(); i++ ){
             if(v.find(*i) != std::string::npos){
                 isBlocked = true;
             }
@@ -150,11 +150,11 @@ bool CommentParser::_convertBilibili(){
         /* Arg7 : sender uid ( not needed ) */
         /* Arg8 : database rowID ( not needed ) */
         
-        ass.AppendComment(appear_time, comment_mode, font_color, child->value());
+        ass.appendComment(appear_time, comment_mode, font_color, child->value());
     }
     
     
-    ass.WriteToDisk(disallowModes);
+    ass.writeToDisk(m_disallowMode);
     
     return true;
 }
@@ -171,24 +171,23 @@ bool CommentParser::_convertBilibili(){
  duration_marquee:Duration of scrolling comment
  duration_still:Duration of still comment
  */
-
-void danmaku2ass(const char *infile,const char *outfile,int width,int height,const char *font,int fontsize,double alpha,int duration_marquee,int duration_still){
+void Danmaku2ASS::run(const char *infile,const char *outfile,int width,int height,const char *font,int fontsize,double alpha,int duration_marquee,int duration_still){
     std::ifstream input(infile);
     string headline;
     getline(input,headline);
     int type = GetCommentType(headline);
     CommentParser p;
-    p.SetFile(infile, outfile);
-    p.SetRes(width, height);
-    p.SetFont(font, fontsize);
-    p.SetDuration(duration_marquee, duration_still);
-    p.SetAlpha(alpha);
+    p.setFile(infile, outfile);
+    p.setResolution(width, height);
+    p.setFont(font, fontsize);
+    p.setDuration(duration_marquee, duration_still);
+    p.setAlpha(alpha);
     if(type == 1){
         //cout << "Avfun format detected ! Converting..." << endl;
         cout << "Sorry , The format is not supported" << endl;
     }else if(type == 2){
         cout << "Bilibili format detected ! Converting..." << endl;
-        bool result = p.Convert(type);
+        bool result = p.convert(type);
         if(result){
             cout << "Convert succeed" << endl;
         }else{
