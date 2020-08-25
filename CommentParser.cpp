@@ -83,7 +83,7 @@ bool CommentParser::convert()
 bool CommentParser::_convertBilibili()
 {
 
-    Ass ass(m_outFile);
+    AssBuilder ass(m_outFile);
     ass.setDuration(m_durationMarquee, m_durationStill);
     ass.writeHead(m_width, m_height, m_font, m_fontSize, m_alpha);
 

@@ -3,7 +3,7 @@
 
 #include <istream>
 #include <vector>
-#include "AssClass.h"
+#include "AssBuilder.h"
 
 namespace Danmaku2ASS
 {

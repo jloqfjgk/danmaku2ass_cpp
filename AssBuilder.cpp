@@ -6,7 +6,7 @@
 //
 //
 
-#include "AssClass.h"
+#include "AssBuilder.h"
 #include <algorithm>
 #include <vector>
 #include <iostream>
@@ -86,17 +86,17 @@ static inline std::string ts2t(double timestamp)
 
 
 
-Ass::Ass(const char *filename){
+AssBuilder::AssBuilder(const char *filename){
     std::remove(filename);
     m_outStream.open(filename);
 }
 
-void Ass::setDuration(int dm, int ds){
+void AssBuilder::setDuration(int dm, int ds){
     m_durationMarquee = dm;
     m_durationStill = ds;
 }
 
-void Ass::writeHead(int width, int height, const char *font, int fontsize, double alpha){
+void AssBuilder::writeHead(int width, int height, const char *font, int fontsize, double alpha) {
     
     srand((int)time(0));
     
@@ -141,7 +141,7 @@ void Ass::writeHead(int width, int height, const char *font, int fontsize, doubl
     m_outStream << "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text" << std::endl;
 }
 
-void Ass::appendComment(double appear_time,int comment_mode,int font_color,const char *content){
+void AssBuilder::appendComment(double appear_time,int comment_mode,int font_color,const char *content){
 
     std::string str = content;
     stripStr(str);
@@ -192,7 +192,7 @@ void Ass::appendComment(double appear_time,int comment_mode,int font_color,const
     
 }
 
-void Ass::writeToDisk(int disallowMode){
+void AssBuilder::writeToDisk(int disallowMode){
     
     int All_Rows = 0;
     int Dropped_Rows = 0;
