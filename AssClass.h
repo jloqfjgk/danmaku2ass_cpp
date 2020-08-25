@@ -9,9 +9,7 @@
 #ifndef __danmaku2ass_native__AssClass__
 #define __danmaku2ass_native__AssClass__
 
-#include <stdio.h>
 #include <fstream>
-#include <vector>
 #include <map>
 
 namespace Danmaku2ASS {

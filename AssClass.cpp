@@ -7,8 +7,6 @@
 //
 
 #include "AssClass.h"
-#include <string.h>
-#include <math.h>
 #include <algorithm>
 #include <vector>
 #include <iostream>

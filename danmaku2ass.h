@@ -9,6 +9,7 @@
 #ifndef bilibili_danmaku2ass_h
 #define bilibili_danmaku2ass_h
 
+#include <istream>
 #include <string>
 #include <vector>
 #include "AssClass.h"
@@ -26,16 +27,25 @@ namespace Danmaku2ASS {
   duration_marquee:Duration of scrolling comment
   duration_still:Duration of still comment
  */
-void run(const char *infile,
-         const char *outfile,
-         int width,
-         int height,
-         const char *font,
-         int fontsize,
-         double alpha,
-         int duration_marquee,
-         int duration_still);
+void parseFile(const char *infile,
+               const char *outfile,
+               int width,
+               int height,
+               const char *font,
+               int fontsize,
+               double alpha,
+               int duration_marquee,
+               int duration_still);
 
+void parseString(const char *instr,
+                 const char *outfile,
+                 int width,
+                 int height,
+                 const char *font,
+                 int fontsize,
+                 double alpha,
+                 int duration_marquee,
+                 int duration_still);
 
 enum CommentType
 {
@@ -49,9 +59,9 @@ enum CommentType
 class CommentParser {
 private:
     std::vector<const char *> m_blockWords;
-    const char *m_inFile;
+    std::istream& m_inStream;
     const char *m_outFile;
-    const char *m_font = "Heiti";
+    const char *m_font;
     int m_width = 1280;
     int m_height = 720;
     int m_fontSize = 20;
@@ -63,14 +73,15 @@ private:
     bool _convertBilibili();
 
 public:
-    inline void setFile(const char *inFile, const char *outFile) { m_inFile = inFile; m_outFile = outFile; }
+    CommentParser(std::istream& source);
+    inline void setOutputFile(const char *outFile) { m_outFile = outFile; }
     inline void setResolution(int width, int height) { m_width = width; m_height = height; }
     inline void setFont(const char *font, int size) { m_font = font; m_fontSize = size; }
     inline void setAlpha(double alpha) { m_alpha = alpha; }
     inline void setDuration(int scroll,int still) { m_durationMarquee = scroll; m_durationStill = still; }
     inline void setDisallowMode(int mode) { m_disallowMode = mode; }
     inline void addBlockWord(const char *word) { m_blockWords.push_back(word); }
-    bool convert(int type);
+    bool convert();
 };
 
 }

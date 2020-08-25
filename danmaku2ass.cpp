@@ -1,10 +1,6 @@
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-#include <map>
 #include <iostream>
+#include <sstream>
 #include <fstream>
-#include <iso646.h>
 
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_utils.hpp"
@@ -31,14 +27,44 @@ static CommentType getCommentType(std::string headline){
 }
 
 
-bool CommentParser::convert(int type) {
-    if(!type){
-        std::ifstream input(m_inFile);
-        std::string headline;
-        getline(input, headline);
-        type = getCommentType(headline);
-        input.close();
+CommentParser::CommentParser(std::istream& source) : m_inStream(source)
+{
+}
+
+
+bool CommentParser::convert() {
+    std::string headline;
+    getline(m_inStream, headline);
+    CommentType type = getCommentType(headline);
+    m_inStream.seekg(0);
+
+    switch (type)
+    {
+    case COMMENT_TYPE_BILIBILI:
+    {
+        std::cout << "Bilibili format detected ! Converting..." << std::endl;
+        if (_convertBilibili())
+        {
+            std::cout << "Convert succeed" << std::endl;
+            return true;
+        }
+        else
+        {
+            std::cerr << "Convert failed" << std::endl;
+            return false;
+        }
     }
+
+    case COMMENT_TYPE_ACFUN:
+    case COMMENT_TYPE_NICONICO:
+        std::cerr << "Sorry , The format is not supported" << std::endl;
+        return false;
+
+    default:
+        std::cerr << "ERROR: Unable to get comment type" << std::endl;
+        return false;
+    }
+
     if(type == COMMENT_TYPE_BILIBILI){
         return _convertBilibili();
     }else{
@@ -52,8 +78,8 @@ bool CommentParser::_convertBilibili(){
     ass.setDuration(m_durationMarquee, m_durationStill);
     ass.writeHead(m_width, m_height, m_font, m_fontSize, m_alpha);
 
-    rapidxml::file<> xmlFile(m_inFile);
-    if(xmlFile.size() < 1){
+    rapidxml::file<> xmlFile(m_inStream);
+    if(xmlFile.size() < 1) {
         return false;
     }
     
@@ -148,44 +174,26 @@ bool CommentParser::_convertBilibili(){
 }
 
 
-void Danmaku2ASS::run(const char *infile,const char *outfile,int width,int height,const char *font,int fontsize,double alpha,int duration_marquee,int duration_still){
+void Danmaku2ASS::parseFile(const char *infile, const char *outfile,int width,int height,const char *font,int fontsize,double alpha,int duration_marquee,int duration_still)
+{
     std::ifstream input(infile);
-    std::string headline;
-    getline(input, headline);
-    CommentType type = getCommentType(headline);
-    CommentParser p;
-    p.setFile(infile, outfile);
+    CommentParser p(input);
     p.setResolution(width, height);
     p.setFont(font, fontsize);
     p.setDuration(duration_marquee, duration_still);
     p.setAlpha(alpha);
-
-    switch (type)
-    {
-    case COMMENT_TYPE_BILIBILI:
-    {
-        std::cout << "Bilibili format detected ! Converting..." << std::endl;
-        bool result = p.convert(type);
-        if (result)
-        {
-            std::cout << "Convert succeed" << std::endl;
-        }
-        else
-        {
-            std::cerr << "Convert failed" << std::endl;
-        }
-        break;
-    }
-    
-    case COMMENT_TYPE_ACFUN:
-    case COMMENT_TYPE_NICONICO:
-        std::cerr << "Sorry , The format is not supported" << std::endl;
-        break;
-
-    default:
-        std::cerr << "ERROR: Unable to get comment type" << std::endl;
-        break;
-    }
+    p.convert();
     input.close();
 }
 
+void Danmaku2ASS::parseString(const char *instr, const char *outfile, int width, int height, const char *font, int fontsize, double alpha, int duration_marquee, int duration_still)
+{
+    std::stringstream input(instr);
+    CommentParser p(input);
+    p.setOutputFile(outfile);
+    p.setResolution(width, height);
+    p.setFont(font, fontsize);
+    p.setDuration(duration_marquee, duration_still);
+    p.setAlpha(alpha);
+    p.convert();
+}
