@@ -88,8 +88,7 @@ static inline std::string ts2t(double timestamp)
 
 
 
-
-void Ass::init(const char *filename){
+Ass::Ass(const char *filename){
     std::remove(filename);
     m_outStream.open(filename);
 }

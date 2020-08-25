@@ -14,29 +14,20 @@ using namespace Danmaku2ASS;
 
 /*
  Get comment type
- 
- headline: the first line of comment file
- 
- Return:
- 1 - Acfun
- 2 - Bilibili
- 3 - Niconico
  */
-
-static int GetCommentType(std::string headline){
+static CommentType getCommentType(std::string headline){
     if(headline.find("\"commentList\":[") != std::string::npos){
-        return 1;
-    }else if(headline.find("xml version=\"1.0\" encoding=\"UTF-8\"?><i") != std::string::npos or
-             headline.find("xml version=\"1.0\" encoding=\"utf-8\"?><i") != std::string::npos or
+        return COMMENT_TYPE_ACFUN;
+    }else if(headline.find("xml version=\"1.0\" encoding=\"UTF-8\"?><i") != std::string::npos ||
+             headline.find("xml version=\"1.0\" encoding=\"utf-8\"?><i") != std::string::npos ||
              headline.find("xml version=\"1.0\" encoding=\"Utf-8\"?>\n") != std::string::npos){
-        return 2;
-    }else if(headline.find("xml version=\"1.0\" encoding=\"UTF-8\"?><p") != std::string::npos or
+        return COMMENT_TYPE_BILIBILI;
+    }else if(headline.find("xml version=\"1.0\" encoding=\"UTF-8\"?><p") != std::string::npos ||
              headline.find("!-- BoonSutazioData=") != std::string::npos){
-        return 3;
+        return COMMENT_TYPE_NICONICO;
     }else{
-        return 0;
+        return COMMENT_TYPE_UNKNOWN;
     }
-    return 0;
 }
 
 
@@ -45,10 +36,10 @@ bool CommentParser::convert(int type) {
         std::ifstream input(m_inFile);
         std::string headline;
         getline(input, headline);
-        type = GetCommentType(headline);
+        type = getCommentType(headline);
         input.close();
     }
-    if(type == 2){
+    if(type == COMMENT_TYPE_BILIBILI){
         return _convertBilibili();
     }else{
         return false;
@@ -56,9 +47,8 @@ bool CommentParser::convert(int type) {
 }
 
 bool CommentParser::_convertBilibili(){
-    Ass ass;
-    
-    ass.init(m_outFile);
+
+    Ass ass(m_outFile);
     ass.setDuration(m_durationMarquee, m_durationStill);
     ass.writeHead(m_width, m_height, m_font, m_fontSize, m_alpha);
 
@@ -157,45 +147,44 @@ bool CommentParser::_convertBilibili(){
     return true;
 }
 
-/*
- Convert comments to .ass subtitle
- 
- infile: comment file path
- outfile: output file path
- width: video width
- height: video height
- font: font name
- alpha: comment alpha
- duration_marquee:Duration of scrolling comment
- duration_still:Duration of still comment
- */
+
 void Danmaku2ASS::run(const char *infile,const char *outfile,int width,int height,const char *font,int fontsize,double alpha,int duration_marquee,int duration_still){
     std::ifstream input(infile);
     std::string headline;
     getline(input, headline);
-    int type = GetCommentType(headline);
+    CommentType type = getCommentType(headline);
     CommentParser p;
     p.setFile(infile, outfile);
     p.setResolution(width, height);
     p.setFont(font, fontsize);
     p.setDuration(duration_marquee, duration_still);
     p.setAlpha(alpha);
-    if(type == 1){
-        //cout << "Avfun format detected ! Converting..." << endl;
-        std::cerr << "Sorry , The format is not supported" << std::endl;
-    }else if(type == 2){
+
+    switch (type)
+    {
+    case COMMENT_TYPE_BILIBILI:
+    {
         std::cout << "Bilibili format detected ! Converting..." << std::endl;
         bool result = p.convert(type);
-        if(result){
+        if (result)
+        {
             std::cout << "Convert succeed" << std::endl;
-        }else{
+        }
+        else
+        {
             std::cerr << "Convert failed" << std::endl;
         }
-    }else if(type == 3){
-        //cout << "Niconico format detected ! Converting..." << endl;
+        break;
+    }
+    
+    case COMMENT_TYPE_ACFUN:
+    case COMMENT_TYPE_NICONICO:
         std::cerr << "Sorry , The format is not supported" << std::endl;
-    }else{
+        break;
+
+    default:
         std::cerr << "ERROR: Unable to get comment type" << std::endl;
+        break;
     }
     input.close();
 }

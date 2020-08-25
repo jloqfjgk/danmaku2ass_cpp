@@ -15,6 +15,17 @@
 
 namespace Danmaku2ASS {
 
+/*
+ Convert comments to .ass subtitle
+  infile: comment file path
+  outfile: output file path
+  width: video width
+  height: video height
+  font: font name
+  alpha: comment alpha
+  duration_marquee:Duration of scrolling comment
+  duration_still:Duration of still comment
+ */
 void run(const char *infile,
          const char *outfile,
          int width,
@@ -24,6 +35,15 @@ void run(const char *infile,
          double alpha,
          int duration_marquee,
          int duration_still);
+
+
+enum CommentType
+{
+    COMMENT_TYPE_UNKNOWN = 0,
+    COMMENT_TYPE_ACFUN = 1,
+    COMMENT_TYPE_BILIBILI = 2,
+    COMMENT_TYPE_NICONICO = 3
+};
 
 
 class CommentParser {

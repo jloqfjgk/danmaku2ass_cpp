@@ -33,7 +33,7 @@ private:
     int m_fontSize;
     
 public:
-    void init(const char *filename);
+    Ass(const char *filename);
     void setDuration(int dm, int ds);
     void writeHead(int width, int height, const char *font, int fontsize, double alpha);
     void appendComment(double appear_time, int comment_mode, int font_color, const char *content);
