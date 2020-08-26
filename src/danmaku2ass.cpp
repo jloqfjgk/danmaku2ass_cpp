@@ -1,7 +1,7 @@
-#include "danmaku2ass.h"
+#include <Danmaku2ASS/danmaku2ass.h>
+#include <Danmaku2ASS/CommentParser.h>
 #include <fstream>
 #include <sstream>
-#include "CommentParser.h"
 
 void danmaku2ass(const char *infile, const char *outfile,int width,int height,const char *font,int fontsize,double alpha,int duration_marquee,int duration_still)
 {

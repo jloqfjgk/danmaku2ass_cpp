@@ -6,7 +6,7 @@
 //
 //
 
-#include "AssBuilder.h"
+#include <Danmaku2ASS/AssBuilder.h>
 #include <algorithm>
 #include <vector>
 #include <iostream>

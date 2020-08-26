@@ -1,4 +1,4 @@
-#include "CommentParser.h"
+#include <Danmaku2ASS/CommentParser.h>
 #include <iostream>
 
 #include "rapidxml/rapidxml.hpp"
