@@ -1,69 +1,96 @@
-# Danmaku2ass native
+# Danmaku2ass (C++ Version)
 
-[![Build Status](https://travis-ci.org/typcn/danmaku2ass_native.svg?branch=master)](https://travis-ci.org/typcn/danmaku2ass_native)
-[![Coverage Status](https://coveralls.io/repos/typcn/danmaku2ass_native/badge.svg)](https://coveralls.io/r/typcn/danmaku2ass_native)
+## Features
 
-# Features
+Danmaku2ASS converts comments from Niconico/Acfun/Bilibili to ASS format so that you can play it with any media player supporting ASS subtitle.
 
-Convrt comments to ASS subtitle，you can play it with most of media players.
+Written in C++, it can convert 10,000 comments in just 0.05 seconds. It doesn't depend on any third-party libraries, so it is easy to embed.
 
-Written in C ++, convert ten thousand comments just 0.05 seconds, not depend on any third-party libraries, easily to embed.
+This library is based on the works of [m13253/danmaku2ass](https://github.com/m13253/danmaku2ass) and [typcn/danmaku2ass_native](https://github.com/typcn/danmaku2ass_native). Much respect to the authors.
 
+## Supported Website
 
-# Supported Website
+Currently only Bilibili is supported. Other websites will be added in the future.
 
-Only support bilibili format , other websites will be added in soon.
+## Usage
 
-# Screenshot
+### As executable
 
-![](http://blog.eqoe.cn/images/1428559449093.png)
+Todo.
 
-# Complie
+### As library
 
-CMake 2.6 or higher and C++ 11 compiler required. (GCC 4.8+, Clang 3.5+, MSVC 2013+ are tested) 
+Download the code and place it into your project, then import it in your CMakeLists.txt:
 
-    git clone https://github.com/typcn/danmaku2ass_native.git
-    mkdir Build
-    cd Build
-    cmake ..
-    make
+```cmake
+add_subdirectory(danmaku2ass)
+include_directories(${PROJECT_SOURCE_DIR}/3rdparty/danmaku2ass/include)
+......
+target_link_libraries(${TARGET_NAME} danmaku2ass)
+```
 
-# Usage
+C-compatible API:
 
-## Command Line
+```c
+#include <Danmaku2ASS/danmaku2ass.h>
 
-    ./danmaku2ass -in=InputFile -out=OutputFile -w=VideoWidth -h=VideoHeight -font="FontName" -fontsize=FontSize -alpha=Alpha(0-1) -dm=ScrollCommentDisplayTime -ds=StillCommentDisplayTime
+void danmaku2ass(const char *infile,    // Input file
+                 const char *outfile,   // Output file
+                 int width,             // Video width
+                 int height,            // Video height
+                 const char *font,      // Font name
+                 int fontsize,          // Font size
+                 double alpha,          // Transparency [0-1]
+                 int duration_marquee,  // Display time of scrolling comments
+                 int duration_still);   // Display time of still comments
+```
 
-## Use in software
+Use in C++:
 
-Complie as library or Add all files to project，and delete main function in danmaku2ass.cpp
+```cpp
+#include <Danmaku2ASS/CommentParser.h>
+#include <Danmaku2ASS/AssBuilder.h>
+#include <fstream>
 
-### API
+void danmaku2ass_example()
+{
+    // Open source file
+    std::ifstream input("danmaku.xml");
+    Danmaku2ASS::CommentParser parser(input);
 
-    #include "danmaku2ass.h"
-    
-    void danmaku2ass(const char *infile,const char *outfile,int width,int height,const char *font,float fontsize,float alpha,float duration_marquee,float duration_still);
+    // Set parameters
+    parser.setResolution(1280, 720); // Video size
+    parser.setFont("Heiti", 32);     // Font name & size
+    parser.setDuration(5, 5);        // Display time of scrolling and still comments
+    parser.setAlpha(alpha);          // Transparency [0-1]
 
-* infile - Input file
-* outfile - Output file
-* width - Video width
-* height - Video height
-* font - Font name
-* fontsize - Font Size
-* alpha - Transparency(0-1)
-* duration_marquee - Scroll comment display time
-* duration_still - Still comment display time
+    // Convert to ASS
+    Danmaku2ASS::AssBuilder::Ptr ass = parser.convert();
 
-# Render comment into video
+    if (ass != nullptr)
+    {
+        // Block scolling and top comments
+        ass->setDisallowMode(Danmaku2ASS::DISALLOW_SCROLL | Danmaku2ASS::DISALLOW_TOP);
 
-You can use ffmpeg to do that.
+        // Block word
+        ass->addBlockWord("114514");
 
-Example usage:
+        // Save to file
+        std::ofstream outfile("output.ass");
+        ass->exportAss(outfile);
+        // Or: ass->exportAssToFile("output.ass");
+    }
+}
+```
 
-ffmpeg -i xxx.flv -vf ass=ASS File -vcodec libx264 -acodec copy xxx_cm.flv
+## Render danmaku into videos
 
-# About
+Use `ffmpeg`:
 
-Thanks for https://github.com/m13253/danmaku2ass
+```shell
+ffmpeg -i foo.flv -vf ass=foo.ass -vcodec libx264 -acodec copy foo-with-danmaku.flv
+```
 
-License: DO ANYTHING YOU WANT TO
+## Licence
+
+Do What The F*ck You Want To
