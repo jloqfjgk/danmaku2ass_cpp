@@ -73,7 +73,7 @@ AssBuilder::Ptr CommentParser::convert()
 
 AssBuilder::Ptr CommentParser::_convertBilibili()
 {
-    AssBuilder::Ptr ass = std::make_shared<AssBuilder>(m_outFile);
+    AssBuilder::Ptr ass = std::make_shared<AssBuilder>();
     ass->setDuration(m_durationMarquee, m_durationStill);
     ass->writeHead(m_width, m_height, m_font, m_fontSize, m_alpha);
 
@@ -106,19 +106,6 @@ AssBuilder::Ptr CommentParser::_convertBilibili()
     for (auto child = node->first_node("d"); child; child = child->next_sibling()) // Each comment
     {
         if (!child)
-        {
-            continue;
-        }
-        std::string v = child->value();
-        bool isBlocked = false;
-        for (const auto& word : m_blockWords)
-        {
-            if (v.find(word) != std::string::npos)
-            {
-                isBlocked = true;
-            }
-        }
-        if (isBlocked)
         {
             continue;
         }

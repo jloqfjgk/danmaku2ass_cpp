@@ -2,7 +2,6 @@
 #define __danmaku2ass_native__CommentParser__
 
 #include <istream>
-#include <vector>
 #include "AssBuilder.h"
 
 namespace Danmaku2ASS
@@ -20,9 +19,7 @@ namespace Danmaku2ASS
     class CommentParser
     {
     private:
-        std::vector<std::string> m_blockWords;
         std::istream &m_inStream;
-        std::string m_outFile;
         std::string m_font;
         int m_width = 1280;
         int m_height = 720;
@@ -35,7 +32,6 @@ namespace Danmaku2ASS
 
     public:
         CommentParser(std::istream &source);
-        inline void setOutputFile(const std::string& outFile) { m_outFile = outFile; }
         inline void setResolution(int width, int height)
         {
             m_width = width;
@@ -52,7 +48,6 @@ namespace Danmaku2ASS
             m_durationMarquee = scroll;
             m_durationStill = still;
         }
-        inline void addBlockWord(const std::string& word) { m_blockWords.push_back(word); }
 
         AssBuilder::Ptr convert();
     };
