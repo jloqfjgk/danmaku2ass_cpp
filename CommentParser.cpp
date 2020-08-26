@@ -111,9 +111,9 @@ AssBuilder::Ptr CommentParser::_convertBilibili()
         }
         std::string v = child->value();
         bool isBlocked = false;
-        for (auto i = m_blockWords.begin(); i != m_blockWords.end(); i++)
+        for (const auto& word : m_blockWords)
         {
-            if (v.find(*i) != std::string::npos)
+            if (v.find(word) != std::string::npos)
             {
                 isBlocked = true;
             }

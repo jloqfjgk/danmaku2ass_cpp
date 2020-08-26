@@ -59,8 +59,7 @@ static inline size_t incUtf8StringIterator(_Iterator1 &it, const _Iterator2 &las
 static inline int utf8StringSize(const std::string &str)
 {
     int res = 0;
-    std::string::const_iterator it = str.begin();
-    for (; it != str.end(); incUtf8StringIterator(it, str.end()))
+    for (auto it = str.cbegin(); it != str.cend(); incUtf8StringIterator(it, str.cend()))
         res++;
     return res;
 }
@@ -86,8 +85,9 @@ static inline std::string ts2t(double timestamp)
 
 
 
-AssBuilder::AssBuilder(const char *filename){
-    std::remove(filename);
+AssBuilder::AssBuilder(const std::string& filename)
+{
+    std::remove(filename.c_str());
     m_outStream.open(filename);
 }
 
@@ -96,8 +96,8 @@ void AssBuilder::setDuration(int dm, int ds){
     m_durationStill = ds;
 }
 
-void AssBuilder::writeHead(int width, int height, const char *font, int fontsize, double alpha) {
-    
+void AssBuilder::writeHead(int width, int height, const std::string& font, int fontsize, double alpha)
+{
     srand((int)time(0));
     
     m_fontSize = fontsize;
@@ -141,8 +141,8 @@ void AssBuilder::writeHead(int width, int height, const char *font, int fontsize
     m_outStream << "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text" << std::endl;
 }
 
-void AssBuilder::appendComment(double appear_time,int comment_mode,int font_color,const char *content){
-
+void AssBuilder::appendComment(double appear_time, int comment_mode, int font_color, const std::string& content)
+{
     std::string str = content;
     stripStr(str);
     

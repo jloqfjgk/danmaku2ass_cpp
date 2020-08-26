@@ -27,10 +27,10 @@ namespace Danmaku2ASS
     public:
         typedef std::shared_ptr<AssBuilder> Ptr;
         
-        AssBuilder(const char *filename);
+        AssBuilder(const std::string& filename);
         void setDuration(int dm, int ds);
-        void writeHead(int width, int height, const char *font, int fontsize, double alpha);
-        void appendComment(double appear_time, int comment_mode, int font_color, const char *content);
+        void writeHead(int width, int height, const std::string& font, int fontsize, double alpha);
+        void appendComment(double appear_time, int comment_mode, int font_color, const std::string& content);
         void writeToDisk(int disallowMode);
 
     private:

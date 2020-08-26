@@ -20,10 +20,10 @@ namespace Danmaku2ASS
     class CommentParser
     {
     private:
-        std::vector<const char *> m_blockWords;
+        std::vector<std::string> m_blockWords;
         std::istream &m_inStream;
-        const char *m_outFile;
-        const char *m_font;
+        std::string m_outFile;
+        std::string m_font;
         int m_width = 1280;
         int m_height = 720;
         int m_fontSize = 20;
@@ -35,13 +35,13 @@ namespace Danmaku2ASS
 
     public:
         CommentParser(std::istream &source);
-        inline void setOutputFile(const char *outFile) { m_outFile = outFile; }
+        inline void setOutputFile(const std::string& outFile) { m_outFile = outFile; }
         inline void setResolution(int width, int height)
         {
             m_width = width;
             m_height = height;
         }
-        inline void setFont(const char *font, int size)
+        inline void setFont(const std::string& font, int size)
         {
             m_font = font;
             m_fontSize = size;
@@ -52,7 +52,7 @@ namespace Danmaku2ASS
             m_durationMarquee = scroll;
             m_durationStill = still;
         }
-        inline void addBlockWord(const char *word) { m_blockWords.push_back(word); }
+        inline void addBlockWord(const std::string& word) { m_blockWords.push_back(word); }
 
         AssBuilder::Ptr convert();
     };
