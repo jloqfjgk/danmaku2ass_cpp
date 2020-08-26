@@ -210,12 +210,18 @@ void AssBuilder::exportAss(std::ostream& output)
         double TextWidth = std::get<2>(iterator->second) + 2.0; // Add some space between texts
 
         // Skip block words
+        bool isBlocked = false;
         for (const auto &word : m_blockWords)
         {
             if (source.find(word) != std::string::npos)
             {
-                continue;
+                isBlocked = true;
+                break;
             }
+        }
+        if (isBlocked)
+        {
+            continue;
         }
 
         double act_time = TextWidth / (((double) m_width + TextWidth)/ (double) m_durationMarquee); // duration of last char visible on screen
