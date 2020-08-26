@@ -9,7 +9,9 @@
 #ifndef bilibili_danmaku2ass_h
 #define bilibili_danmaku2ass_h
 
-namespace Danmaku2ASS {
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  Convert comments to .ass subtitle
@@ -22,17 +24,7 @@ namespace Danmaku2ASS {
   duration_marquee:Duration of scrolling comment
   duration_still:Duration of still comment
  */
-void parseFile(const char *infile,
-               const char *outfile,
-               int width,
-               int height,
-               const char *font,
-               int fontsize,
-               double alpha,
-               int duration_marquee,
-               int duration_still);
-
-void parseString(const char *instr,
+void danmaku2ass(const char *infile,
                  const char *outfile,
                  int width,
                  int height,
@@ -42,5 +34,7 @@ void parseString(const char *instr,
                  int duration_marquee,
                  int duration_still);
 
+#ifdef __cplusplus
 }
+#endif
 #endif
