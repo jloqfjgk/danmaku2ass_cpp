@@ -36,7 +36,7 @@ CommentParser::CommentParser(std::istream &source) : m_inStream(source)
 {
 }
 
-bool CommentParser::convert()
+AssBuilder::Ptr CommentParser::convert()
 {
     std::string headline;
     getline(m_inStream, headline);
@@ -48,49 +48,39 @@ bool CommentParser::convert()
     case COMMENT_TYPE_BILIBILI:
     {
         std::cout << "Bilibili format detected ! Converting..." << std::endl;
-        if (_convertBilibili())
+        AssBuilder::Ptr ass = _convertBilibili();
+        if (ass != nullptr)
         {
             std::cout << "Convert succeed" << std::endl;
-            return true;
         }
         else
         {
             std::cerr << "Convert failed" << std::endl;
-            return false;
         }
+        return ass;
     }
 
     case COMMENT_TYPE_ACFUN:
     case COMMENT_TYPE_NICONICO:
         std::cerr << "Sorry , The format is not supported" << std::endl;
-        return false;
+        return nullptr;
 
     default:
         std::cerr << "ERROR: Unable to get comment type" << std::endl;
-        return false;
-    }
-
-    if (type == COMMENT_TYPE_BILIBILI)
-    {
-        return _convertBilibili();
-    }
-    else
-    {
-        return false;
+        return nullptr;
     }
 }
 
-bool CommentParser::_convertBilibili()
+AssBuilder::Ptr CommentParser::_convertBilibili()
 {
-
-    AssBuilder ass(m_outFile);
-    ass.setDuration(m_durationMarquee, m_durationStill);
-    ass.writeHead(m_width, m_height, m_font, m_fontSize, m_alpha);
+    AssBuilder::Ptr ass = std::make_shared<AssBuilder>(m_outFile);
+    ass->setDuration(m_durationMarquee, m_durationStill);
+    ass->writeHead(m_width, m_height, m_font, m_fontSize, m_alpha);
 
     rapidxml::file<> xmlFile(m_inStream);
     if (xmlFile.size() < 1)
     {
-        return false;
+        return nullptr;
     }
 
     rapidxml::xml_document<> doc;
@@ -103,15 +93,15 @@ bool CommentParser::_convertBilibili()
     catch (const rapidxml::parse_error &e)
     {
         std::cerr << "Parse error: " << e.what() << std::endl;
-        return false;
+        return nullptr;
     }
     if (!node)
     {
-        return false;
+        return nullptr;
     }
     if (!node->first_node("d"))
     {
-        return false;
+        return nullptr;
     }
     for (auto child = node->first_node("d"); child; child = child->next_sibling()) // Each comment
     {
@@ -183,10 +173,7 @@ bool CommentParser::_convertBilibili()
         /* Arg7 : sender uid ( not needed ) */
         /* Arg8 : database rowID ( not needed ) */
 
-        ass.appendComment(appear_time, comment_mode, font_color, child->value());
+        ass->appendComment(appear_time, comment_mode, font_color, child->value());
     }
-
-    ass.writeToDisk(m_disallowMode);
-
-    return true;
+    return ass;
 }

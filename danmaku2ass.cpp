@@ -7,11 +7,15 @@ void Danmaku2ASS::parseFile(const char *infile, const char *outfile,int width,in
 {
     std::ifstream input(infile);
     CommentParser p(input);
+    p.setOutputFile(outfile);
     p.setResolution(width, height);
     p.setFont(font, fontsize);
     p.setDuration(duration_marquee, duration_still);
     p.setAlpha(alpha);
-    p.convert();
+
+    AssBuilder::Ptr ass = p.convert();
+    ass->writeToDisk(0);
+
     input.close();
 }
 
@@ -24,5 +28,7 @@ void Danmaku2ASS::parseString(const char *instr, const char *outfile, int width,
     p.setFont(font, fontsize);
     p.setDuration(duration_marquee, duration_still);
     p.setAlpha(alpha);
-    p.convert();
+
+    AssBuilder::Ptr ass = p.convert();
+    ass->writeToDisk(0);
 }

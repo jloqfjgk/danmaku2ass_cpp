@@ -11,6 +11,7 @@
 
 #include <fstream>
 #include <map>
+#include <memory>
 
 namespace Danmaku2ASS
 {
@@ -22,6 +23,16 @@ namespace Danmaku2ASS
 
     class AssBuilder
     {
+
+    public:
+        typedef std::shared_ptr<AssBuilder> Ptr;
+        
+        AssBuilder(const char *filename);
+        void setDuration(int dm, int ds);
+        void writeHead(int width, int height, const char *font, int fontsize, double alpha);
+        void appendComment(double appear_time, int comment_mode, int font_color, const char *content);
+        void writeToDisk(int disallowMode);
+
     private:
         std::ofstream m_outStream;
         std::map<double, std::pair<int, std::string>> m_commentMap;
@@ -31,13 +42,6 @@ namespace Danmaku2ASS
         int m_width;
         int m_height;
         int m_fontSize;
-
-    public:
-        AssBuilder(const char *filename);
-        void setDuration(int dm, int ds);
-        void writeHead(int width, int height, const char *font, int fontsize, double alpha);
-        void appendComment(double appear_time, int comment_mode, int font_color, const char *content);
-        void writeToDisk(int disallowMode);
     };
 
 } // namespace Danmaku2ASS

@@ -29,10 +29,9 @@ namespace Danmaku2ASS
         int m_fontSize = 20;
         int m_durationMarquee = 5;
         int m_durationStill = 5;
-        int m_disallowMode = DISALLOW_NONE;
         double m_alpha = 0.8;
 
-        bool _convertBilibili();
+        AssBuilder::Ptr _convertBilibili();
 
     public:
         CommentParser(std::istream &source);
@@ -53,9 +52,9 @@ namespace Danmaku2ASS
             m_durationMarquee = scroll;
             m_durationStill = still;
         }
-        inline void setDisallowMode(int mode) { m_disallowMode = mode; }
         inline void addBlockWord(const char *word) { m_blockWords.push_back(word); }
-        bool convert();
+
+        AssBuilder::Ptr convert();
     };
 
 } // namespace Danmaku2ASS
