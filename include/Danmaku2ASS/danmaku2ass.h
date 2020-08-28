@@ -21,18 +21,20 @@ extern "C" {
   height: video height
   font: font name
   alpha: comment alpha
-  duration_marquee:Duration of scrolling comment
-  duration_still:Duration of still comment
+  duration_marquee: Duration of scrolling comment
+  duration_still: Duration of still comment
+
+  Return: 1 if successful; otherwise 0
  */
-void danmaku2ass(const char *infile,
-                 const char *outfile,
-                 int width,
-                 int height,
-                 const char *font,
-                 int fontsize,
-                 double alpha,
-                 int duration_marquee,
-                 int duration_still);
+int danmaku2ass(const char *infile,
+                const char *outfile,
+                int width,
+                int height,
+                const char *font,
+                int fontsize,
+                double alpha,
+                int duration_marquee,
+                int duration_still);
 
 #ifdef __cplusplus
 }

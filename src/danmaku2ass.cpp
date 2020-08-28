@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-void danmaku2ass(const char *infile, const char *outfile,int width,int height,const char *font,int fontsize,double alpha,int duration_marquee,int duration_still)
+int danmaku2ass(const char *infile, const char *outfile,int width,int height,const char *font,int fontsize,double alpha,int duration_marquee,int duration_still)
 {
     std::ifstream input(infile);
     Danmaku2ASS::CommentParser p(input);
@@ -13,7 +13,10 @@ void danmaku2ass(const char *infile, const char *outfile,int width,int height,co
     p.setAlpha(alpha);
 
     auto ass = p.convert();
-    ass->exportAssToFile(outfile);
-
-    input.close();
+    if (ass != nullptr)
+    {
+        ass->exportAssToFile(outfile);
+        return 1;
+    }
+    return 0;
 }
