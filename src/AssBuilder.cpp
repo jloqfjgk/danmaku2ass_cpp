@@ -66,7 +66,7 @@ static inline int utf8StringSize(const std::string &str)
 
 static inline std::string ts2t(double timestamp)
 {
-    int ts = (int)timestamp * 100;
+    int ts = (int) (timestamp * 100);
     int hour, minute, second, centsecond;
     hour = ts / 360000;
     minute = ts % 360000;
