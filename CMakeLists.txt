@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 2.6)
 
 include_directories(include)
 
+if(MSVC)
+       add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 set(DANMAKU2ASS_SRC
     src/AssBuilder.cpp
     src/CommentParser.cpp

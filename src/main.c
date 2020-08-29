@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 
     if (output == NULL)
     {
-        output = (char*) malloc(strlen(input) + 4);
+        output = (char*) malloc(strlen(input) + 5);
         strcpy(output, input);
         strcat(output, ".ass");
     }
