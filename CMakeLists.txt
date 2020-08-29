@@ -16,4 +16,5 @@ add_library(Danmaku2AssCPP ${DANMAKU2ASS_SRC})
 set_target_properties(Danmaku2AssCPP PROPERTIES CXX_STANDARD 11)
 
 add_executable(danmaku2ass src/main.c)
+set_target_properties(danmaku2ass PROPERTIES C_STANDARD 99)
 target_link_libraries(danmaku2ass Danmaku2AssCPP)
