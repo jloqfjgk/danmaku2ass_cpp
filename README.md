@@ -1,5 +1,7 @@
 # Danmaku2ass (C++ Version)
 
+![](https://raw.githubusercontent.com/coslyk/danmaku2ass_cpp/master/screenshot.jpg)
+
 ## Features
 
 Danmaku2ASS converts comments from Niconico/Acfun/Bilibili to ASS format so that you can play it with any media player supporting ASS subtitle.
