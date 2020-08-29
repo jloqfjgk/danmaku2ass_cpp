@@ -1,38 +1,19 @@
 language: cpp
 
-compiler:
-  - gcc
+jobs:
+  include:
+    - name: Ubuntu 14.04 build
+      os: linux
+      dist: trusty
 
-sudo: false
-
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - cmake
-    - g++-4.8
-
-cache:
-  directories:
-  - $HOME/lcov
-
-before_install:
-  - bash ./tests/install_lcov.sh
-
-install:
-  # g++4.8.1
-  - export CXX="g++-4.8"
-  - export GCOV="gcov-4.8"
-  - gem install coveralls-lcov
+    - name: macOS build
+      os: osx
+    
+    - name: Windows (VS2017 x64) build
+      os: windows
 
 script:
-  - rm -rf CMakeLists.txt
-  - cp ./tests/CMakeLists.txt ./CMakeLists.txt
-  - $CXX --version
-  - mkdir Build
-  - cd Build
-  - cmake ..
-  - make
-
-after_success: ../tests/test.sh
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=Release ..
+  - cmake --build . --config Release
