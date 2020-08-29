@@ -16,7 +16,35 @@ Currently only Bilibili is supported. Other websites will be added in the future
 
 ### As executable
 
-Todo.
+Download the binaries from [Releases](https://github.com/coslyk/danmaku2ass_native/releases) page, then make it executable.
+
+```
+Usage: danmaku2ass [-h] [-o OUTPUT] [-s WIDTHxHEIGHT] [-fn FONT]
+                   [-fs SIZE] [-a ALPHA] [-dm SECONDS] [-ds SECONDS]
+                   FILE
+
+positional arguments:
+  FILE                  Comment file to be processed
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Output file
+  -s WIDTHxHEIGHT, --size WIDTHxHEIGHT
+                        Stage size in pixels [default: 1280x720]
+  -fn FONT, --font FONT
+                        Specify font face [default: sans-serif]
+  -fs SIZE, --fontsize SIZE
+                        Default font size [default: 25]
+  -a ALPHA, --alpha ALPHA
+                        Text opacity [default: 1]
+  -dm SECONDS, --duration-marquee SECONDS
+                        Duration of scrolling comment display [default: 5]
+  -ds SECONDS, --duration-still SECONDS
+                        Duration of still comment display [default: 5]
+```
+
+
 
 ### As library
 
@@ -26,7 +54,7 @@ Download the code and place it into your project, then import it in your CMakeLi
 add_subdirectory(danmaku2ass)
 include_directories(${PROJECT_SOURCE_DIR}/3rdparty/danmaku2ass/include)
 ......
-target_link_libraries(${TARGET_NAME} danmaku2ass)
+target_link_libraries(${TARGET_NAME} Danmaku2AssCPP)
 ```
 
 C-compatible API:
