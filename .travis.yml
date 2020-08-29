@@ -5,9 +5,13 @@ jobs:
     - name: Ubuntu 14.04 build
       os: linux
       dist: trusty
+      env:
+        - BINARY_SUFFIX: _linux
 
     - name: macOS build
       os: osx
+      env:
+        - BINARY_SUFFIX: _macos
     
     - name: Windows (VS2017 x64) build
       os: windows
@@ -17,3 +21,13 @@ script:
   - cd build
   - cmake -DCMAKE_BUILD_TYPE=Release ..
   - cmake --build . --config Release
+
+after_success:
+  - mv build/danmaku2ass danmaku2ass${BINARY_SUFFIX}
+  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - bash upload.sh danmaku2ass*
+
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+    - /^(?i:continuous.*)$/
