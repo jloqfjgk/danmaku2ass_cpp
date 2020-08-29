@@ -27,6 +27,7 @@ script:
 
 after_success:
   - mv build/danmaku2ass danmaku2ass${BINARY_SUFFIX}
+  - mv build/danmaku2ass.exe .
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - bash upload.sh danmaku2ass${BINARY_SUFFIX}
 
