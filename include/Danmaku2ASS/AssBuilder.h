@@ -27,16 +27,10 @@ namespace Danmaku2ASS
 
     public:
         typedef std::shared_ptr<AssBuilder> Ptr;
-        
-        inline void setDuration(int dm, int ds)
-        {
-            m_durationMarquee = dm;
-            m_durationStill = ds;
-        }
-        inline void setDisallowMode(int mode) { m_disallowMode = mode; }
-        inline void addBlockWord(const std::string &word) { m_blockWords.push_back(word); }
 
-        void writeHead(int width, int height, const std::string& font, int fontsize, double alpha);
+        AssBuilder(int width,int height, const std::string& font, int fontsize, double alpha, int dm, int ds);
+        inline void setDisallowMode(int mode) { m_disallowMode = mode; }
+        inline void setBlockWords(const std::vector<std::string>& words) { m_blockWords = words; }
         void appendComment(double appear_time, int comment_mode, int font_color, const std::string& content);
 
         void exportAss(std::ostream& output);

@@ -73,9 +73,7 @@ AssBuilder::Ptr CommentParser::convert()
 
 AssBuilder::Ptr CommentParser::_convertBilibili()
 {
-    AssBuilder::Ptr ass = std::make_shared<AssBuilder>();
-    ass->setDuration(m_durationMarquee, m_durationStill);
-    ass->writeHead(m_width, m_height, m_font, m_fontSize, m_alpha);
+    auto ass = std::make_shared<AssBuilder>(m_width, m_height, m_font, m_fontSize, m_alpha, m_durationMarquee, m_durationStill);
 
     rapidxml::file<> xmlFile(m_inStream);
     if (xmlFile.size() < 1)

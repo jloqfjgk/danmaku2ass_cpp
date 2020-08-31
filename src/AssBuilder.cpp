@@ -84,13 +84,10 @@ static inline std::string ts2t(double timestamp)
 
 
 
-void AssBuilder::writeHead(int width, int height, const std::string& font, int fontsize, double alpha)
+AssBuilder::AssBuilder(int width, int height, const std::string& font, int fontsize, double alpha, int dm, int ds) :
+    m_durationMarquee(dm), m_durationStill(ds), m_width(width), m_height(height), m_fontSize(fontsize)
 {
     srand((int)time(0));
-    
-    m_fontSize = fontsize;
-    m_height = height;
-    m_width = width;
     
     // Write a♂ss head info
     std::stringstream head_builder;
