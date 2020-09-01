@@ -192,7 +192,7 @@ void AssBuilder::exportAss(std::ostream& output)
     int TopROW = -1;
     int BottomROW = -1;
     
-    int line = (1.0 - m_reservedArea) * m_height / m_fontSize;
+    int line = static_cast<int>((1.0 - m_reservedArea) * m_height / m_fontSize);
 
     std::vector<double> rows_dismiss_time(line, 0); // The time of scroll comment dismiss
     std::vector<double> rows_visible_time(line, 0); // The time of last char visible on screen
