@@ -46,8 +46,6 @@ optional arguments:
                         Duration of still comment display [default: 5]
 ```
 
-
-
 ### As library
 
 Download the code and place it into your project, then import it in your CMakeLists.txt:
@@ -102,13 +100,16 @@ void danmaku2ass_example()
         // Block scolling and top comments
         ass->setDisallowMode(Danmaku2ASS::DISALLOW_SCROLL | Danmaku2ASS::DISALLOW_TOP);
 
-        // Block word
-        ass->addBlockWord("114514");
+        // Block words
+        std::vector<std::string> blockWords = {"114514"};
+        ass->setBlockWords(blockWords);
+
+        // Reserve 20% of bottom area for subtitles
+        ass->setReservedArea(0.2);
 
         // Save to file
         std::ofstream outfile("output.ass");
         ass->exportAss(outfile);
-        // Or: ass->exportAssToFile("output.ass");
     }
 }
 ```
