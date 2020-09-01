@@ -31,6 +31,7 @@ namespace Danmaku2ASS
         AssBuilder(int width,int height, const std::string& font, int fontsize, double alpha, int dm, int ds);
         inline void setDisallowMode(int mode) { m_disallowMode = mode; }
         inline void setBlockWords(const std::vector<std::string>& words) { m_blockWords = words; }
+        inline void setReservedArea(double reservedArea) { m_reservedArea = reservedArea; }
         void appendComment(double appear_time, int comment_mode, int font_color, const std::string& content);
 
         void exportAss(std::ostream& output);
@@ -49,6 +50,7 @@ namespace Danmaku2ASS
         int m_width = 1280;
         int m_height = 720;
         int m_fontSize = 24;
+        double m_reservedArea = 0;
     };
 
 } // namespace Danmaku2ASS
