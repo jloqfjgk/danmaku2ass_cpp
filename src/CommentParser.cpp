@@ -26,6 +26,10 @@ static CommentType getCommentType(std::string headline)
     {
         return COMMENT_TYPE_NICONICO;
     }
+    else if (headline.find("p") != std::string::npos) // Himado
+    {
+        return COMMENT_TYPE_NICONICO;
+    }
     else
     {
         return COMMENT_TYPE_UNKNOWN;
@@ -59,9 +63,21 @@ AssBuilder::Ptr CommentParser::convert()
         }
         return ass;
     }
-
-    case COMMENT_TYPE_ACFUN:
     case COMMENT_TYPE_NICONICO:
+    {
+        std::cout << "Niconico format detected ! Converting..." << std::endl;
+        AssBuilder::Ptr ass = _convertNiconico();
+        if (ass != nullptr)
+        {
+            std::cout << "Convert succeed" << std::endl;
+        }
+        else
+        {
+            std::cerr << "Convert failed" << std::endl;
+        }
+        return ass;
+    }
+    case COMMENT_TYPE_ACFUN:
         std::cerr << "Sorry , The format is not supported" << std::endl;
         return nullptr;
 
@@ -159,6 +175,75 @@ AssBuilder::Ptr CommentParser::_convertBilibili()
         /* Arg8 : database rowID ( not needed ) */
 
         ass->appendComment(appear_time, comment_mode, font_color, child->value());
+    }
+    return ass;
+}
+
+AssBuilder::Ptr CommentParser::_convertNiconico()
+{
+    auto ass = std::make_shared<AssBuilder>(m_width, m_height, m_font, m_fontSize, m_alpha, m_durationMarquee, m_durationStill);
+
+    int numofinput = 0;
+
+    rapidxml::file<> xmlFile(m_inStream);
+    if (xmlFile.size() < 1)
+    {
+        return nullptr;
+    }
+
+    rapidxml::xml_document<> doc;
+    rapidxml::xml_node<> *node;
+    try
+    {
+        doc.parse<0>(xmlFile.data());
+        node = doc.first_node("packet"); // Get comment main node
+    }
+    catch (const rapidxml::parse_error &e)
+    {
+        std::cerr << "Parse error: " << e.what() << std::endl;
+        return nullptr;
+    }
+    if (!node)
+    {
+        return nullptr;
+    }
+    if (!node->first_node("chat"))
+    {
+        return nullptr;
+    }
+    for (auto child = node->first_node("chat"); child; child = child->next_sibling()) // Each comment
+    {
+        if (!child)
+        {
+            continue;
+        }
+
+        double appear_time = std::__cxx11::stof(child->first_attribute("vpos")->value()) * 0.01;
+
+        if (appear_time < 0)
+            appear_time = 0;
+
+        std::string mailstring = child->first_attribute("mail")->value();
+
+        size_t mypos = 0;
+        std::string mailstyle;
+        int comment_mode = 1;
+
+        while ((mypos = mailstring.find('+')) != std::string::npos)
+        {
+            mailstyle = mailstring.substr(0, mypos);
+            if (mailstyle == "ue")
+                comment_mode = 5;
+            else if (mailstyle == "shita")
+                comment_mode = 4;
+            mailstring.erase(0, mypos + 1);
+        }
+
+        int font_color = 0xffffff; // TODO
+
+        ass->appendComment(appear_time, comment_mode, font_color, child->value());
+
+        numofinput++;
     }
     return ass;
 }

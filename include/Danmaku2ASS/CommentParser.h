@@ -29,6 +29,7 @@ namespace Danmaku2ASS
         double m_alpha = 0.8;
 
         AssBuilder::Ptr _convertBilibili();
+        AssBuilder::Ptr _convertNiconico();
 
     public:
         CommentParser(std::istream &source);
